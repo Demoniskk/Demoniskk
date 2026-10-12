@@ -44,21 +44,29 @@ func Repo(r stats.Repo, owner string, s Style) string {
 			col = s.Muted
 		}
 		c.f(`<circle cx="%.1f" cy="%d" r="4.5" fill="%s"/>`, x+5, y-4, col)
-		c.f(`<text x="%.1f" y="%d" font-size="12" class="muted">%s</text>`, x+16, y, esc(r.Language))
-		x += 16 + float64(len(r.Language))*7 + 16
+		lw := textWidth(r.Language, 12)
+		c.f(`<text x="%.1f" y="%d" font-size="12" class="muted"%s>%s</text>`, x+16, y, fitText(lw), esc(r.Language))
+		x += 16 + lw + 16
 	}
-	c.f(`<text x="%.1f" y="%d" font-size="12" class="muted">★ %s</text>`, x, y, FormatNum(r.Stars))
-	x += 24 + float64(len(FormatNum(r.Stars)))*7
-	if r.Forks > 0 {
-		c.f(`<text x="%.1f" y="%d" font-size="12" class="muted">⑂ %s</text>`, x, y, FormatNum(r.Forks))
-		x += 24 + float64(len(FormatNum(r.Forks)))*7
+	for _, st := range []struct {
+		icon string
+		n    int
+	}{{"★", r.Stars}, {"⑂", r.Forks}} {
+		if st.n == 0 && st.icon == "⑂" {
+			continue
+		}
+		v := FormatNum(st.n)
+		c.f(`<text x="%.1f" y="%d" font-size="12" class="muted">%s</text>`, x, y, st.icon)
+		c.f(`<text x="%.1f" y="%d" font-size="12" class="muted"%s>%s</text>`, x+14, y, fitText(textWidth(v, 12)), v)
+		x += 14 + textWidth(v, 12) + 16
 	}
 	// The live site goes on the right, if it fits next to the stats.
 	if host := siteHost(r.Homepage); host != "" {
-		dotX := float64(tileW-x0) - float64(len([]rune(host)))*6.9 - 12
+		hw := monoWidth(host, 11.5)
+		dotX := float64(tileW-x0) - hw - 10
 		if dotX-8 > x {
 			c.f(`<circle cx="%.1f" cy="%d" r="3.5" fill="#3fb950"/>`, dotX, y-4)
-			c.f(`<text class="mono muted" x="%d" y="%d" font-size="11.5" text-anchor="end">%s</text>`, tileW-x0, y, esc(host))
+			c.f(`<text class="mono muted" x="%d" y="%d" font-size="11.5" text-anchor="end"%s>%s</text>`, tileW-x0, y, fitText(hw), esc(host))
 		}
 	}
 	c.f(`</g>`)

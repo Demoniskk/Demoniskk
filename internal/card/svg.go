@@ -159,6 +159,43 @@ func wrap(s string, maxChars, maxLines int) []string {
 	return lines
 }
 
+// textWidth estimates how wide s renders in the sans stack at size px. Pair it
+// with fitText so the viewer's actual font can't overflow the space reserved.
+func textWidth(s string, size float64) float64 {
+	em := 0.0
+	for _, r := range s {
+		switch {
+		case strings.ContainsRune("il.,:;'|!", r):
+			em += .3
+		case strings.ContainsRune("fjrt ", r):
+			em += .38
+		case r == 'm' || r == 'w':
+			em += .86
+		case r == 'M' || r == 'W':
+			em += .9
+		case r >= 'A' && r <= 'Z':
+			em += .7
+		case r >= '0' && r <= '9':
+			em += .6
+		case r == '%':
+			em += .92
+		default:
+			em += .58
+		}
+	}
+	return em * size
+}
+
+// monoWidth is the width of s in a monospace font at size px.
+func monoWidth(s string, size float64) float64 {
+	return float64(utf8.RuneCountInString(s)) * .62 * size
+}
+
+// fitText pins a text element to an exact width so it never overflows its box.
+func fitText(w float64) string {
+	return fmt.Sprintf(` textLength="%.1f" lengthAdjust="spacingAndGlyphs"`, w)
+}
+
 func truncate(s string, n int) string {
 	r := []rune(s)
 	if len(r) <= n {
