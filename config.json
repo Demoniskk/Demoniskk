@@ -1,0 +1,25 @@
+{
+  "username": "Demoniskk",
+  "accent": ["#ff4d6d", "#a371f7"],
+  "status": "building things in Go",
+  "tagline": "",
+
+  "topLanguages": 8,
+  "excludeLanguages": [],
+  "excludeRepos": [],
+  "includePrivate": false,
+
+  "assetsDir": "assets",
+  "template": "templates/README.md.tmpl",
+  "output": "README.md",
+
+  "about": [
+    "🔭 working on **something cool** — edit `config.json` to change this",
+    "🌱 learning **Go** and whatever catches my eye next",
+    "⚡ fun fact: this README rebuilds itself every 6 hours"
+  ],
+  "skills": ["go", "js", "ts", "py", "git", "github", "vscode", "linux"],
+  "links": [
+    { "label": "GitHub", "url": "https://github.com/Demoniskk" }
+  ]
+}
