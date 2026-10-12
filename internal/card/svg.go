@@ -159,8 +159,9 @@ func wrap(s string, maxChars, maxLines int) []string {
 	return lines
 }
 
-// textWidth estimates how wide s renders in the sans stack at size px. Pair it
-// with fitText so the viewer's actual font can't overflow the space reserved.
+// textWidth estimates how wide s renders in the sans stack at size px. It errs
+// wide, so callers reserve this much space and center the text inside it; the
+// viewer's real font then never overflows, it just gets a little extra padding.
 func textWidth(s string, size float64) float64 {
 	em := 0.0
 	for _, r := range s {
@@ -183,17 +184,12 @@ func textWidth(s string, size float64) float64 {
 			em += .58
 		}
 	}
-	return em * size
+	return em * size * .94
 }
 
 // monoWidth is the width of s in a monospace font at size px.
 func monoWidth(s string, size float64) float64 {
-	return float64(utf8.RuneCountInString(s)) * .62 * size
-}
-
-// fitText pins a text element to an exact width so it never overflows its box.
-func fitText(w float64) string {
-	return fmt.Sprintf(` textLength="%.1f" lengthAdjust="spacingAndGlyphs"`, w)
+	return float64(utf8.RuneCountInString(s)) * .6 * size
 }
 
 func truncate(s string, n int) string {

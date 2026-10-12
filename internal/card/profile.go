@@ -78,9 +78,11 @@ func Profile(p *stats.Profile, s Style, status, tagline string) string {
 	return c.close()
 }
 
-// languageChips shows the top few languages as outlined labels.
+// languageChips shows the top few languages as outlined labels. The dot and name
+// are pinned left and the percentage right, so any difference between the
+// estimated and real font width lands in the gap between them, never at an edge.
 func languageChips(c *canvas, langs []stats.Language, x, y int) {
-	const pad, dot, gap = 11.0, 12.0, 5.0
+	const pad, nameX, gap = 9.0, 23.0, 6.0
 	cx := float64(x)
 	n := 0
 	for _, l := range langs {
@@ -88,17 +90,15 @@ func languageChips(c *canvas, langs []stats.Language, x, y int) {
 			continue
 		}
 		pc := fmt.Sprintf("%.0f%%", l.Percent)
-		nameW, pcW := textWidth(l.Name, 12), monoWidth(pc, 11)
-		w := pad + dot + nameW + gap + pcW + pad
+		w := nameX + textWidth(l.Name, 12) + gap + textWidth(pc, 12) + pad
 		if cx+w > width-24 {
 			break
 		}
-		tx := cx + pad + dot
 		c.f(`<g class="fade"%s>`, delay(.15))
 		c.f(`<rect x="%.1f" y="%.1f" width="%.1f" height="23" rx="11.5" stroke="%s"/>`, cx+.5, float64(y)+.5, w, c.s.Border)
-		c.f(`<circle cx="%.1f" cy="%.1f" r="4" fill="%s"/>`, cx+pad+2, float64(y)+12, l.Color)
-		c.f(`<text x="%.1f" y="%d" font-size="12"%s>%s</text>`, tx, y+16, fitText(nameW), esc(l.Name))
-		c.f(`<text class="mono muted" x="%.1f" y="%d" font-size="11"%s>%s</text>`, tx+nameW+gap, y+16, fitText(pcW), pc)
+		c.f(`<circle cx="%.1f" cy="%.1f" r="4" fill="%s"/>`, cx+pad+4, float64(y)+12, l.Color)
+		c.f(`<text x="%.1f" y="%d" font-size="12">%s</text>`, cx+nameX, y+16, esc(l.Name))
+		c.f(`<text class="muted" x="%.1f" y="%d" font-size="12" text-anchor="end">%s</text>`, cx+w-pad+.5, y+16, pc)
 		c.f(`</g>`)
 		cx += w + 6
 		n++
@@ -107,12 +107,11 @@ func languageChips(c *canvas, langs []stats.Language, x, y int) {
 
 func statusPill(c *canvas, status string) {
 	status = truncate(status, 36)
-	tw := textWidth(status, 12)
-	w := int(tw) + 36
-	x, y := width-20-w, 20
+	w := textWidth(status, 12) + 34
+	x, y := float64(width-20)-w, 20.0
 	c.f(`<g class="fade">`)
-	c.f(`<rect x="%.1f" y="%.1f" width="%d" height="24" rx="12" stroke="%s"/>`, float64(x)+.5, float64(y)+.5, w, c.s.Border)
-	c.f(`<circle cx="%d" cy="%d" r="4" fill="#3fb950"/>`, x+14, y+12)
-	c.f(`<text class="muted" x="%d" y="%d" font-size="12"%s>%s</text>`, x+25, y+16, fitText(tw), esc(status))
+	c.f(`<rect x="%.1f" y="%.1f" width="%.1f" height="24" rx="12" stroke="%s"/>`, x+.5, y+.5, w, c.s.Border)
+	c.f(`<circle cx="%.1f" cy="%.1f" r="4" fill="#3fb950"/>`, x+14, y+12)
+	c.f(`<text class="muted" x="%.1f" y="%.1f" font-size="12">%s</text>`, x+25, y+16, esc(status))
 	c.f(`</g>`)
 }

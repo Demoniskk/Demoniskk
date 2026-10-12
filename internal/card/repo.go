@@ -45,7 +45,7 @@ func Repo(r stats.Repo, owner string, s Style) string {
 		}
 		c.f(`<circle cx="%.1f" cy="%d" r="4.5" fill="%s"/>`, x+5, y-4, col)
 		lw := textWidth(r.Language, 12)
-		c.f(`<text x="%.1f" y="%d" font-size="12" class="muted"%s>%s</text>`, x+16, y, fitText(lw), esc(r.Language))
+		c.f(`<text x="%.1f" y="%d" font-size="12" class="muted">%s</text>`, x+16, y, esc(r.Language))
 		x += 16 + lw + 16
 	}
 	for _, st := range []struct {
@@ -57,16 +57,16 @@ func Repo(r stats.Repo, owner string, s Style) string {
 		}
 		v := FormatNum(st.n)
 		c.f(`<text x="%.1f" y="%d" font-size="12" class="muted">%s</text>`, x, y, st.icon)
-		c.f(`<text x="%.1f" y="%d" font-size="12" class="muted"%s>%s</text>`, x+14, y, fitText(textWidth(v, 12)), v)
+		c.f(`<text x="%.1f" y="%d" font-size="12" class="muted">%s</text>`, x+14, y, v)
 		x += 14 + textWidth(v, 12) + 16
 	}
 	// The live site goes on the right, if it fits next to the stats.
 	if host := siteHost(r.Homepage); host != "" {
 		hw := monoWidth(host, 11.5)
-		dotX := float64(tileW-x0) - hw - 10
+		dotX := float64(tileW-x0) - hw - 8
 		if dotX-8 > x {
 			c.f(`<circle cx="%.1f" cy="%d" r="3.5" fill="#3fb950"/>`, dotX, y-4)
-			c.f(`<text class="mono muted" x="%d" y="%d" font-size="11.5" text-anchor="end"%s>%s</text>`, tileW-x0, y, fitText(hw), esc(host))
+			c.f(`<text class="mono muted" x="%d" y="%d" font-size="11.5" text-anchor="end">%s</text>`, tileW-x0, y, esc(host))
 		}
 	}
 	c.f(`</g>`)
