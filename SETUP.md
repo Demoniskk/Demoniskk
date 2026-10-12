@@ -39,5 +39,7 @@ GH_TOKEN=$(gh auth token) go run .    # your real stats
 - `config.json` → `font`: the cards embed JetBrains Mono (subset woff2 in `fonts/`, OFL license
   in `fonts/OFL.txt`). GitHub blocks external fonts in README images, so embedding is the only
   way. Set `"family": ""` to fall back to the viewer's system fonts.
+- `config.json` → `timezone`: IANA zone for the "last refreshed" line (default `Europe/Oslo`).
+  A README is static, so it cannot show each reader their own local time.
 - `templates/README.md.tmpl`: layout. `{{ card "profile" "alt" }}` inserts a theme-aware card.
   `.User` holds all stats (see `internal/stats/profile.go`).

@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 	"text/template"
 	"time"
 
@@ -38,6 +39,10 @@ func Render(d Data) error {
 			return fmt.Sprintf(`<a href="%s">%s</a>`, r.URL, picture(card.RepoAsset(r.Name), r.Name+": "+r.Description, "49%"))
 		},
 		"num": card.FormatNum,
+		// city turns "Europe/Oslo" into "Oslo".
+		"city": func(tz string) string {
+			return strings.ReplaceAll(path.Base(tz), "_", " ")
+		},
 	}
 
 	t, err := template.New(filepath.Base(d.Config.Template)).Funcs(funcs).ParseFiles(d.Config.Template)

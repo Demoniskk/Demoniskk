@@ -49,6 +49,8 @@ type Config struct {
 	// Tagline replaces your GitHub bio on the profile card when set.
 	Tagline string `json:"tagline"`
 	Font    Font   `json:"font"`
+	// Timezone for the README's "last updated" line, as an IANA name.
+	Timezone string `json:"timezone"`
 
 	TopLanguages     int      `json:"topLanguages"`
 	ExcludeLanguages []string `json:"excludeLanguages"`
@@ -77,6 +79,7 @@ func Load(path string) (*Config, error) {
 		Template:     "templates/README.md.tmpl",
 		Output:       "README.md",
 		AboutCommand: "cat about.toml",
+		Timezone:     "Europe/Oslo",
 	}
 	data, err := os.ReadFile(path)
 	if err != nil {

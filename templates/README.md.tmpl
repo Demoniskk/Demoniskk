@@ -29,4 +29,7 @@
 
 {{ card "activity" "Contribution activity" }}
 
-<p align="center"><sub>auto-updated {{ .UpdatedAt.Format "Jan 2, 2006" }} · rendered in Go by this repo's own <a href="SETUP.md">generator</a></sub></p>
+<p align="center"><sub>
+last refreshed {{ .UpdatedAt.Format "Monday 2 January 2006 at 15:04" }} {{ city .Config.Timezone }} time ({{ .UpdatedAt.Format "MST" }})<br>
+stats and cards are rebuilt every 6 hours by a small Go program running on GitHub Actions · <a href="SETUP.md">how it works</a>
+</sub></p>

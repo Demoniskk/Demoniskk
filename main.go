@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	_ "time/tzdata" // embed the zone database so the configured timezone works on any runner
 
 	"github.com/Demoniskk/Demoniskk/internal/card"
 	"github.com/Demoniskk/Demoniskk/internal/config"
@@ -106,7 +107,11 @@ func run(cfgPath, userFlag string, demo bool) error {
 		}
 	}
 
-	if err := readme.Render(readme.Data{User: p, Config: cfg, UpdatedAt: now}); err != nil {
+	loc, err := time.LoadLocation(cfg.Timezone)
+	if err != nil {
+		return fmt.Errorf("timezone: %w", err)
+	}
+	if err := readme.Render(readme.Data{User: p, Config: cfg, UpdatedAt: now.In(loc)}); err != nil {
 		return fmt.Errorf("render readme: %w", err)
 	}
 
