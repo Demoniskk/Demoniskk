@@ -9,83 +9,76 @@ import (
 	"github.com/Demoniskk/Demoniskk/internal/stats"
 )
 
-// Profile renders the hero card: avatar with orbiting rings, name, bio and headline stats.
+// Profile renders the hero card: avatar, name, bio, top languages and a footer of headline stats.
 func Profile(p *stats.Profile, s Style, status, tagline string) string {
-	const cx, r = 130, 74
+	const cx, r, x = 100, 60, 196
 	bio := cmp.Or(tagline, p.Bio, fmt.Sprintf("%s contributions in the last year across %s repositories.",
 		FormatNum(p.ContributionsLastYear), FormatNum(max(p.Repos, p.ContributedTo))))
-	bioLines := wrap(bio, 66, 2)
+	bioLines := wrap(bio, 72, 2)
 
 	// Vertical rhythm depends on how many bio lines there are.
-	chipsY := 146 + (len(bioLines)-1)*22 + 18
-	dividerY := chipsY + 24 + 22
-	statsY := dividerY + 42
-	h := statsY + 42
-	cy := h / 2
+	chipsY := 114 + (len(bioLines)-1)*22 + 18
+	footerY := chipsY + 24 + 26
+	h := footerY + 50
+	cy := footerY / 2
 
-	css := fmt.Sprintf(`.orbit{transform-origin:%[1]dpx %[2]dpx;animation:spin 18s linear infinite}
-.orbit2{transform-origin:%[1]dpx %[2]dpx;animation:spin 40s linear infinite reverse}
-@keyframes spin{to{transform:rotate(360deg)}}
-.name{font-size:34px;font-weight:800;letter-spacing:-.6px}`, cx, cy)
-	c := newCanvas(width, h, s, p.DisplayName()+" on GitHub", css)
+	c := newCanvas(width, h, s, p.DisplayName()+" on GitHub", "")
 
 	// Avatar.
-	c.f(`<circle class="pulse" cx="%d" cy="%d" r="108" fill="url(#glow1)"/>`, cx, cy)
-	c.f(`<circle class="orbit2" cx="%d" cy="%d" r="94" stroke="%s" stroke-opacity=".6" stroke-dasharray="1.5 7" stroke-linecap="round"/>`, cx, cy, s.Muted)
-	c.f(`<circle class="orbit" cx="%d" cy="%d" r="84" stroke="url(#accent)" stroke-width="3" stroke-linecap="round" stroke-dasharray="118 46 30 46"/>`, cx, cy)
 	c.f(`<clipPath id="av"><circle cx="%d" cy="%d" r="%d"/></clipPath>`, cx, cy, r)
 	if p.Avatar != "" {
 		c.f(`<image href="%s" x="%d" y="%d" width="%d" height="%d" clip-path="url(#av)" preserveAspectRatio="xMidYMid slice"/>`, p.Avatar, cx-r, cy-r, 2*r, 2*r)
 	} else {
 		initial, _ := utf8.DecodeRuneInString(strings.ToUpper(p.DisplayName()))
-		c.f(`<circle cx="%d" cy="%d" r="%d" fill="url(#accent)"/>`, cx, cy, r)
-		c.f(`<text x="%d" y="%d" text-anchor="middle" font-size="60" font-weight="800" style="fill:#fff">%s</text>`, cx, cy+21, esc(string(initial)))
+		c.f(`<circle cx="%d" cy="%d" r="%d" fill="%s"/>`, cx, cy, r, s.Track)
+		c.f(`<text class="muted" x="%d" y="%d" text-anchor="middle" font-size="48" font-weight="600">%s</text>`, cx, cy+17, esc(string(initial)))
 	}
-	c.f(`<circle cx="%d" cy="%d" r="%d" stroke="%s" stroke-width="2"/>`, cx, cy, r, s.Border)
+	c.f(`<circle cx="%d" cy="%d" r="%.1f" stroke="%s"/>`, cx, cy, float64(r)+.5, s.Border)
 
 	// Identity.
-	x := 252
-	c.f(`<text class="name fade" x="%d" y="88" style="fill:url(#accent)">%s</text>`, x, esc(truncate(p.DisplayName(), 24)))
-
-	meta := []string{"@" + p.Login}
+	c.f(`<text class="fade" x="%d" y="62" font-size="26" font-weight="600">%s</text>`, x, esc(truncate(p.DisplayName(), 28)))
+	var meta []string
+	if !strings.EqualFold(p.DisplayName(), p.Login) {
+		meta = append(meta, p.Login)
+	}
 	if p.Location != "" {
 		meta = append(meta, p.Location)
 	}
 	if !p.CreatedAt.IsZero() {
-		meta = append(meta, fmt.Sprintf("since %d", p.CreatedAt.Year()))
+		meta = append(meta, fmt.Sprintf("on GitHub since %d", p.CreatedAt.Year()))
 	}
-	c.f(`<text class="mono muted fade" x="%d" y="115" font-size="13"%s>%s</text>`, x, delay(.1), esc(truncate(strings.Join(meta, "  ·  "), 72)))
-
+	c.f(`<text class="muted fade" x="%d" y="86" font-size="14"%s>%s</text>`, x, delay(.05), esc(truncate(strings.Join(meta, " · "), 80)))
 	for i, line := range bioLines {
-		c.f(`<text class="fade" x="%d" y="%d" font-size="15" opacity=".92"%s>%s</text>`, x, 146+i*22, delay(.2+float64(i)*.05), esc(line))
+		c.f(`<text class="fade" x="%d" y="%d" font-size="14.5"%s>%s</text>`, x, 114+i*22, delay(.1), esc(line))
 	}
-
 	languageChips(c, p.Languages, x, chipsY)
-
-	// Headline stats.
-	c.f(`<rect class="grow" x="%d" y="%d" width="%d" height="1" fill="%s"%s/>`, x, dividerY, width-x-32, s.Border, delay(.3))
-	items := []struct {
-		label string
-		value int
-	}{
-		{"Commits", p.Commits},
-		{"Stars", p.Stars},
-		{"Pull reqs", p.PullRequests},
-		{"Followers", p.Followers},
-		{"Repos", p.Repos},
-	}
-	colW := (width - x - 32) / len(items)
-	for i, it := range items {
-		c.stat(x+i*colW, statsY, FormatNum(it.value), "", it.label, .35+float64(i)*.08)
-	}
 
 	if status != "" {
 		statusPill(c, status)
 	}
+
+	// Footer strip with headline stats, like a GitHub box footer.
+	c.f(`<rect x="1" y="%d" width="%d" height="%d" fill="%s" clip-path="url(#box)"/>`, footerY, width-2, h-footerY, s.Surface)
+	c.f(`<rect x="1" y="%d" width="%d" height="1" fill="%s"/>`, footerY, width-2, s.Border)
+	items := []struct {
+		value int
+		label string
+	}{
+		{p.Commits, "commits"},
+		{p.PullRequests, "pull requests"},
+		{p.Stars, "stars"},
+		{p.Repos, "repositories"},
+		{p.Followers, "followers"},
+	}
+	colW := (width - 40) / len(items)
+	for i, it := range items {
+		c.f(`<text class="fade" x="%d" y="%d" font-size="14"%s><tspan font-weight="600">%s</tspan><tspan class="muted" dx="5">%s</tspan></text>`,
+			20+i*colW, footerY+30, delay(.2+float64(i)*.05), FormatNum(it.value), it.label)
+	}
 	return c.close()
 }
 
-// languageChips shows the top few languages as small pills.
+// languageChips shows the top few languages as outlined labels.
 func languageChips(c *canvas, langs []stats.Language, x, y int) {
 	cx := float64(x)
 	n := 0
@@ -94,28 +87,27 @@ func languageChips(c *canvas, langs []stats.Language, x, y int) {
 			continue
 		}
 		pc := fmt.Sprintf("%.0f%%", l.Percent)
-		w := float64(utf8.RuneCountInString(l.Name))*7.2 + float64(len(pc))*7 + 36
-		if cx+w > width-32 {
+		w := float64(utf8.RuneCountInString(l.Name))*7.2 + float64(len(pc))*7 + 34
+		if cx+w > width-24 {
 			break
 		}
-		c.f(`<g class="fade"%s>`, delay(.25+float64(n)*.06))
-		c.f(`<rect x="%.1f" y="%d" width="%.1f" height="24" rx="12" fill="%s" fill-opacity=".14" stroke="%s" stroke-opacity=".45"/>`, cx, y, w, l.Color, l.Color)
-		c.f(`<circle cx="%.1f" cy="%d" r="4" fill="%s"/>`, cx+13, y+12, l.Color)
-		c.f(`<text x="%.1f" y="%d" font-size="12.5" font-weight="600">%s<tspan class="mono muted" font-size="11.5" font-weight="400" dx="6">%s</tspan></text>`, cx+23, y+16, esc(l.Name), pc)
+		c.f(`<g class="fade"%s>`, delay(.15))
+		c.f(`<rect x="%.1f" y="%.1f" width="%.1f" height="23" rx="11.5" stroke="%s"/>`, cx+.5, float64(y)+.5, w, c.s.Border)
+		c.f(`<circle cx="%.1f" cy="%.1f" r="4" fill="%s"/>`, cx+13, float64(y)+12, l.Color)
+		c.f(`<text x="%.1f" y="%d" font-size="12">%s<tspan class="muted" dx="5">%s</tspan></text>`, cx+23, y+16, esc(l.Name), pc)
 		c.f(`</g>`)
-		cx += w + 8
+		cx += w + 6
 		n++
 	}
 }
 
 func statusPill(c *canvas, status string) {
 	status = truncate(status, 36)
-	w := int(float64(utf8.RuneCountInString(status))*7.25) + 40
-	x, y := width-28-w, 24
-	c.f(`<g class="fade"%s>`, delay(.5))
-	c.f(`<rect x="%d" y="%d" width="%d" height="26" rx="13" fill="%s" fill-opacity=".7" stroke="%s"/>`, x, y, w, c.s.Bg, c.s.Border)
-	c.f(`<circle class="pulse" cx="%d" cy="%d" r="7" fill="#3fb950" fill-opacity=".25"/>`, x+16, y+13)
-	c.f(`<circle cx="%d" cy="%d" r="3.5" fill="#3fb950"/>`, x+16, y+13)
-	c.f(`<text class="mono" x="%d" y="%d" font-size="12">%s</text>`, x+28, y+17, esc(status))
+	w := int(float64(utf8.RuneCountInString(status))*6.9) + 34
+	x, y := width-20-w, 20
+	c.f(`<g class="fade">`)
+	c.f(`<rect x="%.1f" y="%.1f" width="%d" height="24" rx="12" stroke="%s"/>`, float64(x)+.5, float64(y)+.5, w, c.s.Border)
+	c.f(`<circle cx="%d" cy="%d" r="4" fill="#3fb950"/>`, x+14, y+12)
+	c.f(`<text class="muted" x="%d" y="%d" font-size="12">%s</text>`, x+25, y+16, esc(status))
 	c.f(`</g>`)
 }

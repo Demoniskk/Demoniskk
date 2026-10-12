@@ -1,6 +1,6 @@
 {
   "username": "Demoniskk",
-  "accent": ["#ff4d6d", "#a371f7"],
+  "accent": "#e5534b",
   "status": "shipping small tools",
   "tagline": "I build small tools that fill the gaps big platforms leave behind.",
 
@@ -26,8 +26,9 @@
 
   "toolbox": [
     { "group": "languages", "items": ["Go", "Python", "JavaScript", "HTML & CSS"] },
-    { "group": "platforms", "items": ["GitHub Actions", "GitHub Pages", "Discord", "Steam", "Leetify", "RSS", "Web Crypto"] },
-    { "group": "daily", "items": ["Git", "VS Code", "Windows", "PowerShell"] }
+    { "group": "platforms", "items": ["GitHub Actions", "GitHub Pages", "Discord", "Steam"] },
+    { "group": "apis", "items": ["Discord API", "Steam Web API", "Leetify", "Web Crypto"] },
+    { "group": "tools", "items": ["Git", "VS Code", "PowerShell", "Windows"] }
   ],
 
   "featured": [

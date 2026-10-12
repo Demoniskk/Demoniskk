@@ -83,7 +83,7 @@ func run(cfgPath, userFlag string, demo bool) error {
 		os.Remove(f)
 	}
 	for _, t := range []card.Theme{card.Dark, card.Light} {
-		s := card.Style{Theme: t, A1: cfg.Accent[0], A2: cfg.Accent[1]}
+		s := card.Style{Theme: t, Accent: cfg.Accent}
 		cards := []struct{ name, svg string }{
 			{"profile", card.Profile(p, s, cfg.Status, cfg.Tagline)},
 			{"about", card.About(p.Login, cfg.AboutCommand, cfg.About, s)},

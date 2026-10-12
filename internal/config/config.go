@@ -34,8 +34,8 @@ type FeaturedRepo struct {
 type Config struct {
 	// Username is the GitHub login to render. Falls back to $GITHUB_REPOSITORY_OWNER.
 	Username string `json:"username"`
-	// Accent is the two-stop gradient used across every card.
-	Accent []string `json:"accent"`
+	// Accent is the single highlight color used sparingly across the cards.
+	Accent string `json:"accent"`
 	// Status is shown as a pill in the corner of the profile card. Empty hides it.
 	Status string `json:"status"`
 	// Tagline replaces your GitHub bio on the profile card when set.
@@ -62,7 +62,7 @@ var hexColor = regexp.MustCompile(`^#[0-9a-fA-F]{6}$`)
 
 func Load(path string) (*Config, error) {
 	c := &Config{
-		Accent:       []string{"#ff4d6d", "#a371f7"},
+		Accent:       "#e5534b",
 		TopLanguages: 8,
 		AssetsDir:    "assets",
 		Template:     "templates/README.md.tmpl",
@@ -76,13 +76,8 @@ func Load(path string) (*Config, error) {
 	if err := json.Unmarshal(data, c); err != nil {
 		return nil, fmt.Errorf("parse %s: %w", path, err)
 	}
-	if len(c.Accent) != 2 {
-		return nil, fmt.Errorf("accent must list exactly 2 colors, got %d", len(c.Accent))
-	}
-	for _, col := range c.Accent {
-		if !hexColor.MatchString(col) {
-			return nil, fmt.Errorf("accent color %q must look like #rrggbb", col)
-		}
+	if !hexColor.MatchString(c.Accent) {
+		return nil, fmt.Errorf("accent color %q must look like #rrggbb", c.Accent)
 	}
 	c.TopLanguages = min(max(c.TopLanguages, 1), 10)
 	return c, nil

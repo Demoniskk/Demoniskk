@@ -8,7 +8,7 @@ import (
 	"github.com/Demoniskk/Demoniskk/internal/stats"
 )
 
-const tileW, tileH = 412, 164
+const tileW, tileH = 412, 150
 
 var unsafeChars = regexp.MustCompile(`[^a-z0-9._-]+`)
 
@@ -19,32 +19,31 @@ func RepoAsset(name string) string {
 
 // Repo renders a half-width tile for a featured repository.
 func Repo(r stats.Repo, owner string, s Style) string {
-	const x0 = 24
-	c := newCanvas(tileW, tileH, s, r.Name, `.rname{font-size:17px;font-weight:700;letter-spacing:-.2px}
-.arrow{fill:url(#accent)}`)
+	const x0 = 20
+	c := newCanvas(tileW, tileH, s, r.Name, "")
 
-	c.f(`<text class="mono muted fade" x="%d" y="34" font-size="11.5">%s /</text>`, x0, esc(strings.ToLower(owner)))
-	c.f(`<text class="rname fade" x="%d" y="56"%s>%s</text>`, x0, delay(.05), esc(truncate(r.Name, 32)))
-	c.f(`<text class="arrow fade" x="%d" y="42" font-size="18" text-anchor="end"%s>↗</text>`, tileW-x0, delay(.1))
+	c.f(`<rect x="%d" y="22" width="3" height="16" rx="1" fill="%s"/>`, x0, s.Accent)
+	c.f(`<text class="fade" x="%d" y="36" font-size="15" font-weight="600">%s</text>`, x0+11, esc(truncate(r.Name, 34)))
+	c.f(`<text class="muted fade" x="%d" y="36" font-size="15" text-anchor="end">↗</text>`, tileW-x0)
 
 	desc := r.Description
 	if desc == "" {
 		desc = "No description yet."
 	}
-	for i, line := range wrap(desc, 54, 3) {
-		c.f(`<text class="fade" x="%d" y="%d" font-size="13" opacity=".8"%s>%s</text>`, x0, 82+i*19, delay(.15+float64(i)*.05), esc(line))
+	for i, line := range wrap(desc, 56, 3) {
+		c.f(`<text class="muted fade" x="%d" y="%d" font-size="13"%s>%s</text>`, x0, 64+i*19, delay(.05), esc(line))
 	}
 
 	// Footer: language, stars, live site.
-	y := tileH - 20
+	y := tileH - 18
 	x := float64(x0)
-	c.f(`<g class="fade"%s>`, delay(.35))
+	c.f(`<g class="fade"%s>`, delay(.1))
 	if r.Language != "" {
 		col := r.LanguageColor
 		if col == "" {
 			col = s.Muted
 		}
-		c.f(`<circle cx="%.1f" cy="%d" r="5" fill="%s"/>`, x+5, y-4, col)
+		c.f(`<circle cx="%.1f" cy="%d" r="4.5" fill="%s"/>`, x+5, y-4, col)
 		c.f(`<text x="%.1f" y="%d" font-size="12" class="muted">%s</text>`, x+16, y, esc(r.Language))
 		x += 16 + float64(len(r.Language))*7 + 16
 	}
@@ -58,7 +57,7 @@ func Repo(r stats.Repo, owner string, s Style) string {
 	if host := siteHost(r.Homepage); host != "" {
 		dotX := float64(tileW-x0) - float64(len([]rune(host)))*6.9 - 12
 		if dotX-8 > x {
-			c.f(`<circle class="pulse" cx="%.1f" cy="%d" r="3.5" fill="#3fb950"/>`, dotX, y-4)
+			c.f(`<circle cx="%.1f" cy="%d" r="3.5" fill="#3fb950"/>`, dotX, y-4)
 			c.f(`<text class="mono muted" x="%d" y="%d" font-size="11.5" text-anchor="end">%s</text>`, tileW-x0, y, esc(host))
 		}
 	}

@@ -11,10 +11,10 @@ import (
 // Activity renders the last year of contributions as an accent-tinted heatmap with streak stats.
 func Activity(p *stats.Profile, s Style) string {
 	const (
-		h            = 304
+		h            = 290
 		cell, step   = 11, 14
-		gridX, gridY = 66, 98
-		x0           = 32
+		gridX, gridY = 62, 86
+		x0           = 20
 	)
 
 	// Column index per day; a new column starts every Sunday.
@@ -36,8 +36,7 @@ func Activity(p *stats.Profile, s Style) string {
 	}
 	c := newCanvas(width, h, s, "Contribution activity", css.String())
 
-	c.f(`<text class="title fade" x="%d" y="50">Contributions</text>`, x0)
-	c.f(`<text class="mono muted sub fade" x="%d" y="50" text-anchor="end"%s>%s in the last year</text>`, width-x0, delay(.1), FormatNum(p.ContributionsLastYear))
+	c.header("Contributions", FormatNum(p.ContributionsLastYear)+" in the last year")
 
 	// Month and weekday labels.
 	lastMonth, lastLabelCol := -1, -10
@@ -70,8 +69,8 @@ func Activity(p *stats.Profile, s Style) string {
 	}
 	if n := len(p.Calendar); n > 0 {
 		last := p.Calendar[n-1]
-		c.f(`<rect class="pulse" x="%.1f" y="%.1f" width="14" height="14" rx="4" stroke="%s" stroke-width="1.5"/>`,
-			float64(gridX+cols[n-1]*step)-1.5, float64(gridY+last.Weekday*step)-1.5, s.A1)
+		c.f(`<rect x="%.1f" y="%.1f" width="13" height="13" rx="3.5" stroke="%s"/>`,
+			float64(gridX+cols[n-1]*step)-1, float64(gridY+last.Weekday*step)-1, s.Text)
 	}
 
 	// Legend.
@@ -86,7 +85,9 @@ func Activity(p *stats.Profile, s Style) string {
 	c.f(`</g>`)
 
 	// Stats.
-	c.f(`<rect class="grow" x="%d" y="226" width="%d" height="1" fill="%s"%s/>`, x0, width-2*x0, s.Border, delay(.4))
+	const footerY = 214
+	c.f(`<rect x="1" y="%d" width="%d" height="%d" fill="%s" clip-path="url(#box)"/>`, footerY, width-2, h-footerY, s.Surface)
+	c.f(`<rect x="1" y="%d" width="%d" height="1" fill="%s"/>`, footerY, width-2, s.Border)
 	best := "—"
 	if p.BestDay.Count > 0 {
 		best = p.BestDay.Date.Format("Jan 2")
@@ -100,7 +101,7 @@ func Activity(p *stats.Profile, s Style) string {
 	}
 	colW := (width - 2*x0) / len(items)
 	for i, it := range items {
-		c.stat(x0+i*colW, 264, it.value, it.unit, it.label, .5+float64(i)*.08)
+		c.stat(x0+i*colW, footerY+34, it.value, it.unit, it.label, .5+float64(i)*.08)
 	}
 	return c.close()
 }
@@ -141,8 +142,7 @@ func levelColor(s Style, lvl int) (fill, opacity string) {
 	if lvl == 0 {
 		return s.Track, ""
 	}
-	t := float64(lvl-1) / 3
-	return mix(s.A2, s.A1, t), fmt.Sprintf(` fill-opacity="%.2f"`, .4+.6*t)
+	return s.Accent, fmt.Sprintf(` fill-opacity="%.2f"`, []float64{0, .3, .5, .75, 1}[lvl])
 }
 
 func plural(n int, word string) string {
