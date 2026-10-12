@@ -12,7 +12,7 @@ func Languages(p *stats.Profile, s Style) string {
 	langs := p.Languages
 	rows := max((len(langs)+1)/2, 1)
 	h := firstRow + rows*rowH
-	c := newCanvas(h, s, "Most used languages", "")
+	c := newCanvas(width, h, s, "Most used languages", "")
 
 	c.f(`<text class="title fade" x="%d" y="50">Most used languages</text>`, x0)
 	c.f(`<text class="mono muted sub fade" x="%d" y="50" text-anchor="end"%s>by code size · %d repos</text>`, width-x0, delay(.1), p.LanguageRepos)

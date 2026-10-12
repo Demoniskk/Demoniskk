@@ -12,6 +12,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/Demoniskk/Demoniskk/internal/card"
@@ -59,21 +60,39 @@ func run(cfgPath, userFlag string, demo bool) error {
 			TopLanguages:     cfg.TopLanguages,
 			ExcludeLanguages: cfg.ExcludeLanguages,
 			ExcludeRepos:     cfg.ExcludeRepos,
+			Featured:         featuredNames(cfg),
 		})
 		if err != nil {
 			return err
+		}
+	}
+	for i, r := range p.Featured {
+		for _, f := range cfg.Featured {
+			if strings.EqualFold(f.Repo, r.Name) && f.Description != "" {
+				p.Featured[i].Description = f.Description
+			}
 		}
 	}
 
 	if err := os.MkdirAll(cfg.AssetsDir, 0o755); err != nil {
 		return err
 	}
+	// Drop tiles for repos that are no longer featured.
+	stale, _ := filepath.Glob(filepath.Join(cfg.AssetsDir, "repo-*.svg"))
+	for _, f := range stale {
+		os.Remove(f)
+	}
 	for _, t := range []card.Theme{card.Dark, card.Light} {
 		s := card.Style{Theme: t, A1: cfg.Accent[0], A2: cfg.Accent[1]}
 		cards := []struct{ name, svg string }{
 			{"profile", card.Profile(p, s, cfg.Status, cfg.Tagline)},
+			{"about", card.About(p.Login, cfg.AboutCommand, cfg.About, s)},
+			{"toolbox", card.Toolbox(p, cfg.Toolbox, s)},
 			{"languages", card.Languages(p, s)},
 			{"activity", card.Activity(p, s)},
+		}
+		for _, r := range p.Featured {
+			cards = append(cards, struct{ name, svg string }{card.RepoAsset(r.Name), card.Repo(r, p.Login, s)})
 		}
 		for _, c := range cards {
 			out := filepath.Join(cfg.AssetsDir, c.name+"-"+t.Name+".svg")
@@ -90,4 +109,12 @@ func run(cfgPath, userFlag string, demo bool) error {
 	log.Printf("✓ %s — %d commits, %d stars, %d languages, %d-day streak → %s + %s/",
 		p.Login, p.Commits, p.Stars, len(p.Languages), p.CurrentStreak, cfg.Output, cfg.AssetsDir)
 	return nil
+}
+
+func featuredNames(cfg *config.Config) []string {
+	names := make([]string, len(cfg.Featured))
+	for i, f := range cfg.Featured {
+		names[i] = f.Repo
+	}
+	return names
 }

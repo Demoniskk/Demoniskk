@@ -34,7 +34,7 @@ GH_TOKEN=$(gh auth token) go run .    # your real stats
 
 ## Customising
 
-- `config.json`: accent gradient, status pill, tagline, about lines, skill icons
-  ([skillicons.dev ids](https://github.com/tandpfun/skill-icons#icons-list)), links, excluded languages/repos.
+- `config.json`: accent gradient, status pill, tagline, terminal `about` lines, `toolbox`
+  groups, `featured` repos (order + description overrides), links, excluded languages/repos.
 - `templates/README.md.tmpl`: layout. `{{ card "profile" "alt" }}` inserts a theme-aware card.
   `.User` holds all stats (see `internal/stats/profile.go`).

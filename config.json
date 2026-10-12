@@ -1,8 +1,8 @@
 {
   "username": "Demoniskk",
   "accent": ["#ff4d6d", "#a371f7"],
-  "status": "building things in Go",
-  "tagline": "",
+  "status": "shipping small tools",
+  "tagline": "I build small tools that fill the gaps big platforms leave behind.",
 
   "topLanguages": 8,
   "excludeLanguages": [],
@@ -13,13 +13,29 @@
   "template": "templates/README.md.tmpl",
   "output": "README.md",
 
+  "aboutCommand": "cat about.toml",
   "about": [
-    "🔭 working on **something cool** — edit `config.json` to change this",
-    "🌱 learning **Go** and whatever catches my eye next",
-    "⚡ fun fact: this README rebuilds itself every 6 hours"
+    { "key": "handle",  "value": "\"Demoniskk\"" },
+    { "key": "builds",  "value": "\"small tools for things that should already exist\"" },
+    { "key": "stack",   "value": "[\"Go\", \"Python\", \"JavaScript\"]" },
+    { "key": "runs_on", "value": "\"GitHub Actions crons + static pages, zero servers\"" },
+    { "key": "latest",  "value": "\"RSS feeds for every podcast on NRK Radio\"" },
+    { "key": "tinkers", "value": "[\"Discord mods\", \"CS2 stats\", \"Switch homebrew\"]" },
+    { "key": "motto",   "value": "\"if it's annoying, automate it\"" }
   ],
-  "skills": ["go", "js", "ts", "py", "git", "github", "vscode", "linux"],
-  "links": [
-    { "label": "GitHub", "url": "https://github.com/Demoniskk" }
-  ]
+
+  "toolbox": [
+    { "group": "languages", "items": ["Go", "Python", "JavaScript", "HTML & CSS"] },
+    { "group": "platforms", "items": ["GitHub Actions", "GitHub Pages", "Discord", "Steam", "Leetify", "RSS", "Web Crypto"] },
+    { "group": "daily", "items": ["Git", "VS Code", "Windows", "PowerShell"] }
+  ],
+
+  "featured": [
+    { "repo": "nrk-rss", "description": "RSS feeds for every podcast on NRK Radio, which NRK never published. Rebuilt daily, served as a static site." },
+    { "repo": "Igniter", "description": "Repacks a .bin into a .dat for the SX Pro dongle, entirely in your browser. Nothing leaves your machine." },
+    { "repo": "cs2-stats-discord-widget", "description": "Keeps your CS2 Premier and Wingman ranks on your Discord profile, using Leetify and Steam stats." },
+    { "repo": "shelter-free-screen-share" }
+  ],
+
+  "links": []
 }

@@ -30,7 +30,7 @@ func Demo(login string, now time.Time) *Profile {
 			{Name: "Other", Color: "#8b949e", Percent: 2.6},
 		},
 		LanguageRepos: 31,
-		Pinned: []Repo{
+		Featured: []Repo{
 			{Name: "fastcache", Description: "Sharded in-memory cache with zero allocations on the hot path", URL: "https://github.com/" + login, Language: "Go", Stars: 180},
 			{Name: "glint", Description: "A tiny terminal UI toolkit", URL: "https://github.com/" + login, Language: "Rust", Stars: 96},
 			{Name: "dotfiles", Description: "My setup, documented", URL: "https://github.com/" + login, Language: "Shell", Stars: 31},

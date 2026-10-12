@@ -50,8 +50,7 @@ func (c *canvas) f(format string, args ...any) { fmt.Fprintf(c, format, args...)
 
 // newCanvas writes the shared frame: gradient surface, dot grid, drifting glows
 // and a shimmering accent edge along the top.
-func newCanvas(h int, s Style, title, css string) *canvas {
-	w := width
+func newCanvas(w, h int, s Style, title, css string) *canvas {
 	c := &canvas{w: w, h: h, s: s}
 	c.f(`<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d" fill="none" role="img" aria-label="%s">`, w, h, w, h, esc(title))
 	c.f(`<title>%s</title><defs>`, esc(title))
@@ -68,8 +67,8 @@ func newCanvas(h int, s Style, title, css string) *canvas {
 	c.f(`<g clip-path="url(#frame)">`)
 	c.f(`<rect width="%d" height="%d" fill="url(#surface)"/>`, w, h)
 	c.f(`<rect width="%d" height="%d" fill="url(#dots)"/>`, w, h)
-	c.f(`<circle class="drift" cx="%d" cy="-30" r="280" fill="url(#glow1)"/>`, w-120)
-	c.f(`<circle class="drift2" cx="40" cy="%d" r="240" fill="url(#glow2)"/>`, h+40)
+	c.f(`<circle class="drift" cx="%d" cy="-30" r="%d" fill="url(#glow1)"/>`, w-w/7, max(w/3, 150))
+	c.f(`<circle class="drift2" cx="40" cy="%d" r="%d" fill="url(#glow2)"/>`, h+40, max(w*2/7, 130))
 	c.f(`<rect width="%d" height="2" fill="url(#edge)"/>`, w)
 	c.f(`<rect class="spark" x="-180" width="180" height="2" fill="url(#spark)"/>`)
 	c.f(`</g>`)

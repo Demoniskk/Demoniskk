@@ -5,49 +5,23 @@
 
 <div align="center">
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/profile-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/profile-light.svg">
-  <img alt="Demoniskk's GitHub profile" src="assets/profile-dark.svg" width="100%">
-</picture>
-
-<a href="https://github.com/Demoniskk"><b>GitHub</b></a>
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/profile-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/profile-light.svg"><img alt="Demoniskk&#39;s GitHub profile" src="assets/profile-dark.svg" width="100%"></picture>
 
 </div>
 
-## ⟡ about
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/about-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/about-light.svg"><img alt="About Demoniskk" src="assets/about-dark.svg" width="100%"></picture>
 
-- 🔭 working on **something cool** — edit `config.json` to change this
-- 🌱 learning **Go** and whatever catches my eye next
-- ⚡ fun fact: this README rebuilds itself every 6 hours
+<p align="center">
+<a href="https://github.com/Demoniskk/nrk-rss"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/repo-nrk-rss-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/repo-nrk-rss-light.svg"><img alt="nrk-rss: RSS feeds for every podcast on NRK Radio, which NRK never published. Rebuilt daily, served as a static site." src="assets/repo-nrk-rss-dark.svg" width="49%"></picture></a>
+<a href="https://github.com/Demoniskk/Igniter"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/repo-igniter-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/repo-igniter-light.svg"><img alt="Igniter: Repacks a .bin into a .dat for the SX Pro dongle, entirely in your browser. Nothing leaves your machine." src="assets/repo-igniter-dark.svg" width="49%"></picture></a>
+<a href="https://github.com/Demoniskk/cs2-stats-discord-widget"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/repo-cs2-stats-discord-widget-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/repo-cs2-stats-discord-widget-light.svg"><img alt="cs2-stats-discord-widget: Keeps your CS2 Premier and Wingman ranks on your Discord profile, using Leetify and Steam stats." src="assets/repo-cs2-stats-discord-widget-dark.svg" width="49%"></picture></a>
+<a href="https://github.com/Demoniskk/shelter-free-screen-share"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/repo-shelter-free-screen-share-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/repo-shelter-free-screen-share-light.svg"><img alt="shelter-free-screen-share: Shelter plugin that unlocks all Discord screen share quality presets (resolution/FPS) without Nitro" src="assets/repo-shelter-free-screen-share-dark.svg" width="49%"></picture></a>
+</p>
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/toolbox-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/toolbox-light.svg"><img alt="Toolbox" src="assets/toolbox-dark.svg" width="100%"></picture>
 
-## ⟡ toolbox
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/languages-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/languages-light.svg"><img alt="Most used languages" src="assets/languages-dark.svg" width="100%"></picture>
 
-<img src="https://skillicons.dev/icons?i=go,js,ts,py,git,github,vscode,linux&perline=12" alt="go, js, ts, py, git, github, vscode, linux" />
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/activity-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/activity-light.svg"><img alt="Contribution activity" src="assets/activity-dark.svg" width="100%"></picture>
 
-## ⟡ stats
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/languages-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/languages-light.svg">
-  <img alt="Most used languages" src="assets/languages-dark.svg" width="100%">
-</picture>
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/activity-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/activity-light.svg">
-  <img alt="Contribution activity" src="assets/activity-dark.svg" width="100%">
-</picture>
-
-## ⟡ featured
-
-| project | about | lang | ★ |
-| :-- | :-- | :-- | --: |
-| [**cs2-stats-discord-widget**](https://github.com/Demoniskk/cs2-stats-discord-widget) |  | Python | 0 |
-| [**Igniter**](https://github.com/Demoniskk/Igniter) | Repacks a .bin to .dat to use with a SX Pro Dongle | HTML | 0 |
-| [**nrk-rss**](https://github.com/Demoniskk/nrk-rss) | Podcast RSS feeds for every podcast on NRK Radio. NRK doesn't publish feeds you can paste… | Go | 0 |
-| [**shelter-free-screen-share**](https://github.com/Demoniskk/shelter-free-screen-share) | Shelter plugin that unlocks all Discord screen share quality presets (resolution/FPS) wit… | JavaScript | 0 |
-
-
-<div align="center"><sub>updated Oct 12, 2026 · rendered with Go + GitHub Actions</sub></div>
+<p align="center"><sub>auto-updated Oct 12, 2026 · rendered in Go by this repo's own <a href="SETUP.md">generator</a></sub></p>

@@ -6,40 +6,27 @@
 <div align="center">
 
 {{ card "profile" (printf "%s's GitHub profile" .User.DisplayName) }}
-
 {{- with .Config.Links }}
 
 {{ range $i, $l := . }}{{ if $i }}&nbsp;&nbsp;·&nbsp;&nbsp;{{ end }}<a href="{{ $l.URL }}"><b>{{ $l.Label }}</b></a>{{ end }}
 {{- end }}
 
 </div>
-{{- with .Config.About }}
 
-## ⟡ about
+{{ card "about" (printf "About %s" .User.Login) }}
+{{- with .User.Featured }}
 
-{{ range . }}- {{ . }}
-{{ end }}
+<p align="center">
+{{- range . }}
+{{ repo . }}
 {{- end }}
-{{- with .Config.Skills }}
-
-## ⟡ toolbox
-
-<img src="{{ skillicons . }}" alt="{{ range $i, $s := . }}{{ if $i }}, {{ end }}{{ $s }}{{ end }}" />
+</p>
 {{- end }}
 
-## ⟡ stats
+{{ card "toolbox" "Toolbox" }}
 
 {{ card "languages" "Most used languages" }}
 
 {{ card "activity" "Contribution activity" }}
-{{- with .User.Pinned }}
 
-## ⟡ featured
-
-| project | about | lang | ★ |
-| :-- | :-- | :-- | --: |
-{{ range . }}| [**{{ .Name }}**]({{ .URL }}) | {{ cell (short .Description 90) }} | {{ .Language }} | {{ num .Stars }} |
-{{ end }}
-{{- end }}
-
-<div align="center"><sub>updated {{ .UpdatedAt.Format "Jan 2, 2006" }} · rendered with Go + GitHub Actions</sub></div>
+<p align="center"><sub>auto-updated {{ .UpdatedAt.Format "Jan 2, 2006" }} · rendered in Go by this repo's own <a href="SETUP.md">generator</a></sub></p>

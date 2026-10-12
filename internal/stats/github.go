@@ -31,11 +31,13 @@ type Options struct {
 	TopLanguages     int
 	ExcludeLanguages []string
 	ExcludeRepos     []string
+	// Featured lists repo names to showcase, in order. Empty means pinned repos.
+	Featured []string
 }
 
 const repoFields = `
 fragment repo on Repository {
-  name description url stargazerCount forkCount isPrivate isArchived
+  name description url homepageUrl stargazerCount forkCount isPrivate isArchived
   primaryLanguage { name color }
 }`
 
@@ -81,6 +83,7 @@ type repoNode struct {
 	Name            string `json:"name"`
 	Description     string `json:"description"`
 	URL             string `json:"url"`
+	HomepageURL     string `json:"homepageUrl"`
 	StargazerCount  int    `json:"stargazerCount"`
 	ForkCount       int    `json:"forkCount"`
 	IsPrivate       bool   `json:"isPrivate"`
@@ -101,7 +104,7 @@ type repoNode struct {
 }
 
 func (r repoNode) toRepo() Repo {
-	out := Repo{Name: r.Name, Description: r.Description, URL: r.URL, Stars: r.StargazerCount, Forks: r.ForkCount}
+	out := Repo{Name: r.Name, Description: r.Description, URL: r.URL, Homepage: r.HomepageURL, Stars: r.StargazerCount, Forks: r.ForkCount}
 	if r.PrimaryLanguage != nil {
 		out.Language, out.LanguageColor = r.PrimaryLanguage.Name, r.PrimaryLanguage.Color
 	}
@@ -210,7 +213,7 @@ func Fetch(ctx context.Context, c *Client, opt Options) (*Profile, error) {
 		}
 	}
 	for _, n := range gu.PinnedItems.Nodes {
-		p.Pinned = append(p.Pinned, n.toRepo())
+		p.Featured = append(p.Featured, n.toRepo())
 	}
 
 	repos, err := c.repos(ctx, opt)
@@ -325,10 +328,19 @@ func (p *Profile) applyRepos(repos []repoNode, opt Options) {
 	}
 	p.Languages = langs
 
-	// No pinned repos? Feature the most-starred public ones instead.
-	if len(p.Pinned) == 0 {
+	// An explicit list wins; otherwise pinned repos, otherwise the most-starred.
+	if len(opt.Featured) > 0 {
+		p.Featured = nil
+		for _, name := range opt.Featured {
+			i := slices.IndexFunc(public, func(r Repo) bool { return strings.EqualFold(r.Name, name) })
+			if i >= 0 {
+				p.Featured = append(p.Featured, public[i])
+			}
+		}
+	}
+	if len(p.Featured) == 0 {
 		slices.SortStableFunc(public, func(a, b Repo) int { return b.Stars - a.Stars })
-		p.Pinned = public[:min(len(public), 4)]
+		p.Featured = public[:min(len(public), 4)]
 	}
 }
 

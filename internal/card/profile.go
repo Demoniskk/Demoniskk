@@ -11,13 +11,23 @@ import (
 
 // Profile renders the hero card: avatar with orbiting rings, name, bio and headline stats.
 func Profile(p *stats.Profile, s Style, status, tagline string) string {
-	const h = 268
-	const cx, cy, r = 130, 134, 74
+	const cx, r = 130, 74
+	bio := cmp.Or(tagline, p.Bio, fmt.Sprintf("%s contributions in the last year across %s repositories.",
+		FormatNum(p.ContributionsLastYear), FormatNum(max(p.Repos, p.ContributedTo))))
+	bioLines := wrap(bio, 66, 2)
+
+	// Vertical rhythm depends on how many bio lines there are.
+	chipsY := 146 + (len(bioLines)-1)*22 + 18
+	dividerY := chipsY + 24 + 22
+	statsY := dividerY + 42
+	h := statsY + 42
+	cy := h / 2
+
 	css := fmt.Sprintf(`.orbit{transform-origin:%[1]dpx %[2]dpx;animation:spin 18s linear infinite}
 .orbit2{transform-origin:%[1]dpx %[2]dpx;animation:spin 40s linear infinite reverse}
 @keyframes spin{to{transform:rotate(360deg)}}
 .name{font-size:34px;font-weight:800;letter-spacing:-.6px}`, cx, cy)
-	c := newCanvas(h, s, p.DisplayName()+" on GitHub", css)
+	c := newCanvas(width, h, s, p.DisplayName()+" on GitHub", css)
 
 	// Avatar.
 	c.f(`<circle class="pulse" cx="%d" cy="%d" r="108" fill="url(#glow1)"/>`, cx, cy)
@@ -46,14 +56,14 @@ func Profile(p *stats.Profile, s Style, status, tagline string) string {
 	}
 	c.f(`<text class="mono muted fade" x="%d" y="115" font-size="13"%s>%s</text>`, x, delay(.1), esc(truncate(strings.Join(meta, "  ·  "), 72)))
 
-	bio := cmp.Or(tagline, p.Bio, fmt.Sprintf("%s contributions in the last year across %s repositories.",
-		FormatNum(p.ContributionsLastYear), FormatNum(max(p.Repos, p.ContributedTo))))
-	for i, line := range wrap(bio, 66, 2) {
+	for i, line := range bioLines {
 		c.f(`<text class="fade" x="%d" y="%d" font-size="15" opacity=".92"%s>%s</text>`, x, 146+i*22, delay(.2+float64(i)*.05), esc(line))
 	}
 
+	languageChips(c, p.Languages, x, chipsY)
+
 	// Headline stats.
-	c.f(`<rect class="grow" x="%d" y="182" width="%d" height="1" fill="%s"%s/>`, x, width-x-32, s.Border, delay(.3))
+	c.f(`<rect class="grow" x="%d" y="%d" width="%d" height="1" fill="%s"%s/>`, x, dividerY, width-x-32, s.Border, delay(.3))
 	items := []struct {
 		label string
 		value int
@@ -66,13 +76,36 @@ func Profile(p *stats.Profile, s Style, status, tagline string) string {
 	}
 	colW := (width - x - 32) / len(items)
 	for i, it := range items {
-		c.stat(x+i*colW, 224, FormatNum(it.value), "", it.label, .35+float64(i)*.08)
+		c.stat(x+i*colW, statsY, FormatNum(it.value), "", it.label, .35+float64(i)*.08)
 	}
 
 	if status != "" {
 		statusPill(c, status)
 	}
 	return c.close()
+}
+
+// languageChips shows the top few languages as small pills.
+func languageChips(c *canvas, langs []stats.Language, x, y int) {
+	cx := float64(x)
+	n := 0
+	for _, l := range langs {
+		if l.Name == "Other" || n == 4 {
+			continue
+		}
+		pc := fmt.Sprintf("%.0f%%", l.Percent)
+		w := float64(utf8.RuneCountInString(l.Name))*7.2 + float64(len(pc))*7 + 36
+		if cx+w > width-32 {
+			break
+		}
+		c.f(`<g class="fade"%s>`, delay(.25+float64(n)*.06))
+		c.f(`<rect x="%.1f" y="%d" width="%.1f" height="24" rx="12" fill="%s" fill-opacity=".14" stroke="%s" stroke-opacity=".45"/>`, cx, y, w, l.Color, l.Color)
+		c.f(`<circle cx="%.1f" cy="%d" r="4" fill="%s"/>`, cx+13, y+12, l.Color)
+		c.f(`<text x="%.1f" y="%d" font-size="12.5" font-weight="600">%s<tspan class="mono muted" font-size="11.5" font-weight="400" dx="6">%s</tspan></text>`, cx+23, y+16, esc(l.Name), pc)
+		c.f(`</g>`)
+		cx += w + 8
+		n++
+	}
 }
 
 func statusPill(c *canvas, status string) {

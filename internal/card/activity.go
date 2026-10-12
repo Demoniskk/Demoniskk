@@ -34,7 +34,7 @@ func Activity(p *stats.Profile, s Style) string {
 	for i := range nCols {
 		fmt.Fprintf(&css, ".d%d{animation-delay:%.3fs}", i, .2+float64(i)*.022)
 	}
-	c := newCanvas(h, s, "Contribution activity", css.String())
+	c := newCanvas(width, h, s, "Contribution activity", css.String())
 
 	c.f(`<text class="title fade" x="%d" y="50">Contributions</text>`, x0)
 	c.f(`<text class="mono muted sub fade" x="%d" y="50" text-anchor="end"%s>%s in the last year</text>`, width-x0, delay(.1), FormatNum(p.ContributionsLastYear))

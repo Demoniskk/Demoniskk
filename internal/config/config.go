@@ -13,6 +13,24 @@ type Link struct {
 	URL   string `json:"url"`
 }
 
+// AboutLine is one `key = value` row in the terminal-style about card.
+// Text inside double quotes in Value is highlighted as a string.
+type AboutLine struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+type ToolGroup struct {
+	Group string   `json:"group"`
+	Items []string `json:"items"`
+}
+
+type FeaturedRepo struct {
+	Repo string `json:"repo"`
+	// Description overrides the repo's own description when set.
+	Description string `json:"description"`
+}
+
 type Config struct {
 	// Username is the GitHub login to render. Falls back to $GITHUB_REPOSITORY_OWNER.
 	Username string `json:"username"`
@@ -33,9 +51,11 @@ type Config struct {
 	Template  string `json:"template"`
 	Output    string `json:"output"`
 
-	About  []string `json:"about"`
-	Skills []string `json:"skills"`
-	Links  []Link   `json:"links"`
+	AboutCommand string         `json:"aboutCommand"`
+	About        []AboutLine    `json:"about"`
+	Toolbox      []ToolGroup    `json:"toolbox"`
+	Featured     []FeaturedRepo `json:"featured"`
+	Links        []Link         `json:"links"`
 }
 
 var hexColor = regexp.MustCompile(`^#[0-9a-fA-F]{6}$`)
@@ -47,6 +67,7 @@ func Load(path string) (*Config, error) {
 		AssetsDir:    "assets",
 		Template:     "templates/README.md.tmpl",
 		Output:       "README.md",
+		AboutCommand: "cat about.toml",
 	}
 	data, err := os.ReadFile(path)
 	if err != nil {

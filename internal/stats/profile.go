@@ -25,6 +25,7 @@ type Repo struct {
 	URL           string
 	Language      string
 	LanguageColor string
+	Homepage      string
 	Stars         int
 	Forks         int
 }
@@ -63,7 +64,7 @@ type Profile struct {
 
 	Languages     []Language
 	LanguageRepos int
-	Pinned        []Repo
+	Featured      []Repo
 }
 
 func (p *Profile) DisplayName() string {
