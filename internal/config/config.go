@@ -31,6 +31,14 @@ type FeaturedRepo struct {
 	Description string `json:"description"`
 }
 
+// Font embeds a woff2 typeface into the cards. An empty Family uses system fonts.
+type Font struct {
+	Family    string `json:"family"`
+	Regular   string `json:"regular"`
+	Bold      string `json:"bold"`
+	Monospace bool   `json:"monospace"`
+}
+
 type Config struct {
 	// Username is the GitHub login to render. Falls back to $GITHUB_REPOSITORY_OWNER.
 	Username string `json:"username"`
@@ -40,6 +48,7 @@ type Config struct {
 	Status string `json:"status"`
 	// Tagline replaces your GitHub bio on the profile card when set.
 	Tagline string `json:"tagline"`
+	Font    Font   `json:"font"`
 
 	TopLanguages     int      `json:"topLanguages"`
 	ExcludeLanguages []string `json:"excludeLanguages"`

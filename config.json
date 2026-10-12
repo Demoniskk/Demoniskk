@@ -3,6 +3,12 @@
   "accent": "#e5534b",
   "status": "shipping small tools",
   "tagline": "I build small tools that fill the gaps big platforms leave behind.",
+  "font": {
+    "family": "JetBrains Mono",
+    "regular": "fonts/JetBrainsMono-Regular.woff2",
+    "bold": "fonts/JetBrainsMono-Bold.woff2",
+    "monospace": true
+  },
 
   "topLanguages": 8,
   "excludeLanguages": [],

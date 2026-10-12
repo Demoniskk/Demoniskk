@@ -82,8 +82,12 @@ func run(cfgPath, userFlag string, demo bool) error {
 	for _, f := range stale {
 		os.Remove(f)
 	}
+	font, err := loadFont(cfg.Font)
+	if err != nil {
+		return err
+	}
 	for _, t := range []card.Theme{card.Dark, card.Light} {
-		s := card.Style{Theme: t, Accent: cfg.Accent}
+		s := card.Style{Theme: t, Accent: cfg.Accent, Font: font}
 		cards := []struct{ name, svg string }{
 			{"profile", card.Profile(p, s, cfg.Status, cfg.Tagline)},
 			{"about", card.About(p.Login, cfg.AboutCommand, cfg.About, s)},
@@ -109,6 +113,23 @@ func run(cfgPath, userFlag string, demo bool) error {
 	log.Printf("✓ %s — %d commits, %d stars, %d languages, %d-day streak → %s + %s/",
 		p.Login, p.Commits, p.Stars, len(p.Languages), p.CurrentStreak, cfg.Output, cfg.AssetsDir)
 	return nil
+}
+
+func loadFont(f config.Font) (*card.Font, error) {
+	if f.Family == "" {
+		return nil, nil
+	}
+	regular, err := os.ReadFile(f.Regular)
+	if err != nil {
+		return nil, fmt.Errorf("font: %w", err)
+	}
+	var bold []byte
+	if f.Bold != "" {
+		if bold, err = os.ReadFile(f.Bold); err != nil {
+			return nil, fmt.Errorf("font: %w", err)
+		}
+	}
+	return &card.Font{Family: f.Family, Regular: regular, Bold: bold, Monospace: f.Monospace}, nil
 }
 
 func featuredNames(cfg *config.Config) []string {

@@ -14,7 +14,7 @@ func Profile(p *stats.Profile, s Style, status, tagline string) string {
 	const cx, r, x = 100, 60, 196
 	bio := cmp.Or(tagline, p.Bio, fmt.Sprintf("%s contributions in the last year across %s repositories.",
 		FormatNum(p.ContributionsLastYear), FormatNum(max(p.Repos, p.ContributedTo))))
-	bioLines := wrap(bio, 72, 2)
+	bioLines := wrap(bio, s.charsFit(14.5, width-x-24, 72), 2)
 
 	// Vertical rhythm depends on how many bio lines there are.
 	chipsY := 114 + (len(bioLines)-1)*22 + 18
@@ -36,7 +36,7 @@ func Profile(p *stats.Profile, s Style, status, tagline string) string {
 	c.f(`<circle cx="%d" cy="%d" r="%.1f" stroke="%s"/>`, cx, cy, float64(r)+.5, s.Border)
 
 	// Identity.
-	c.f(`<text class="fade" x="%d" y="62" font-size="26" font-weight="600">%s</text>`, x, esc(truncate(p.DisplayName(), 28)))
+	c.f(`<text class="fade" x="%d" y="62" font-size="26" font-weight="600">%s</text>`, x, esc(truncate(p.DisplayName(), s.charsFit(26, 420, 28))))
 	var meta []string
 	if !strings.EqualFold(p.DisplayName(), p.Login) {
 		meta = append(meta, p.Login)
@@ -47,7 +47,7 @@ func Profile(p *stats.Profile, s Style, status, tagline string) string {
 	if !p.CreatedAt.IsZero() {
 		meta = append(meta, fmt.Sprintf("on GitHub since %d", p.CreatedAt.Year()))
 	}
-	c.f(`<text class="muted fade" x="%d" y="86" font-size="14"%s>%s</text>`, x, delay(.05), esc(truncate(strings.Join(meta, " · "), 80)))
+	c.f(`<text class="muted fade" x="%d" y="86" font-size="14"%s>%s</text>`, x, delay(.05), esc(truncate(strings.Join(meta, " · "), s.charsFit(14, width-x-24, 80))))
 	for i, line := range bioLines {
 		c.f(`<text class="fade" x="%d" y="%d" font-size="14.5"%s>%s</text>`, x, 114+i*22, delay(.1), esc(line))
 	}
@@ -90,7 +90,7 @@ func languageChips(c *canvas, langs []stats.Language, x, y int) {
 			continue
 		}
 		pc := fmt.Sprintf("%.0f%%", l.Percent)
-		w := nameX + textWidth(l.Name, 12) + gap + textWidth(pc, 12) + pad
+		w := nameX + c.s.textWidth(l.Name, 12) + gap + c.s.textWidth(pc, 12) + pad
 		if cx+w > width-24 {
 			break
 		}
@@ -107,7 +107,7 @@ func languageChips(c *canvas, langs []stats.Language, x, y int) {
 
 func statusPill(c *canvas, status string) {
 	status = truncate(status, 36)
-	w := textWidth(status, 12) + 34
+	w := c.s.textWidth(status, 12) + 34
 	x, y := float64(width-20)-w, 20.0
 	c.f(`<g class="fade">`)
 	c.f(`<rect x="%.1f" y="%.1f" width="%.1f" height="24" rx="12" stroke="%s"/>`, x+.5, y+.5, w, c.s.Border)

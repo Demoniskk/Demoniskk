@@ -8,7 +8,7 @@ import (
 	"github.com/Demoniskk/Demoniskk/internal/stats"
 )
 
-const tileW, tileH = 412, 150
+const tileW, tileH = 412, 164
 
 var unsafeChars = regexp.MustCompile(`[^a-z0-9._-]+`)
 
@@ -23,14 +23,14 @@ func Repo(r stats.Repo, owner string, s Style) string {
 	c := newCanvas(tileW, tileH, s, r.Name, "")
 
 	c.f(`<rect x="%d" y="22" width="3" height="16" rx="1" fill="%s"/>`, x0, s.Accent)
-	c.f(`<text class="fade" x="%d" y="36" font-size="15" font-weight="600">%s</text>`, x0+11, esc(truncate(r.Name, 34)))
+	c.f(`<text class="fade" x="%d" y="36" font-size="15" font-weight="600">%s</text>`, x0+11, esc(truncate(r.Name, s.charsFit(15, tileW-2*x0-40, 34))))
 	c.f(`<text class="muted fade" x="%d" y="36" font-size="15" text-anchor="end">↗</text>`, tileW-x0)
 
 	desc := r.Description
 	if desc == "" {
 		desc = "No description yet."
 	}
-	for i, line := range wrap(desc, 56, 3) {
+	for i, line := range wrap(desc, s.charsFit(13, tileW-2*x0, 56), 3) {
 		c.f(`<text class="muted fade" x="%d" y="%d" font-size="13"%s>%s</text>`, x0, 64+i*19, delay(.05), esc(line))
 	}
 
@@ -44,7 +44,7 @@ func Repo(r stats.Repo, owner string, s Style) string {
 			col = s.Muted
 		}
 		c.f(`<circle cx="%.1f" cy="%d" r="4.5" fill="%s"/>`, x+5, y-4, col)
-		lw := textWidth(r.Language, 12)
+		lw := s.textWidth(r.Language, 12)
 		c.f(`<text x="%.1f" y="%d" font-size="12" class="muted">%s</text>`, x+16, y, esc(r.Language))
 		x += 16 + lw + 16
 	}
@@ -58,10 +58,11 @@ func Repo(r stats.Repo, owner string, s Style) string {
 		v := FormatNum(st.n)
 		c.f(`<text x="%.1f" y="%d" font-size="12" class="muted">%s</text>`, x, y, st.icon)
 		c.f(`<text x="%.1f" y="%d" font-size="12" class="muted">%s</text>`, x+14, y, v)
-		x += 14 + textWidth(v, 12) + 16
+		x += 14 + s.textWidth(v, 12) + 16
 	}
 	// The live site goes on the right, if it fits next to the stats.
-	if host := siteHost(r.Homepage); host != "" {
+	room := float64(tileW-x0) - x - 18 // space left of the right edge, minus the dot
+	if host := siteHost(r.Homepage, int(room/(.6*11.5))); host != "" {
 		hw := monoWidth(host, 11.5)
 		dotX := float64(tileW-x0) - hw - 8
 		if dotX-8 > x {
@@ -74,10 +75,11 @@ func Repo(r stats.Repo, owner string, s Style) string {
 }
 
 // siteHost turns "https://demoniskk.github.io/nrk-rss/" into "demoniskk.github.io/nrk-rss".
-func siteHost(raw string) string {
+// siteHost returns "" when fewer than 12 characters fit, since a stub URL is noise.
+func siteHost(raw string, maxChars int) string {
 	u, err := url.Parse(raw)
-	if raw == "" || err != nil || u.Host == "" {
+	if raw == "" || err != nil || u.Host == "" || maxChars < 12 {
 		return ""
 	}
-	return truncate(strings.TrimSuffix(u.Host+u.Path, "/"), 30)
+	return truncate(strings.TrimSuffix(u.Host+u.Path, "/"), min(maxChars, 30))
 }

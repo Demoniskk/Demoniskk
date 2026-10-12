@@ -36,5 +36,8 @@ GH_TOKEN=$(gh auth token) go run .    # your real stats
 
 - `config.json`: accent color, status pill, tagline, terminal `about` lines, `toolbox`
   groups, `featured` repos (order + description overrides), links, excluded languages/repos.
+- `config.json` → `font`: the cards embed JetBrains Mono (subset woff2 in `fonts/`, OFL license
+  in `fonts/OFL.txt`). GitHub blocks external fonts in README images, so embedding is the only
+  way. Set `"family": ""` to fall back to the viewer's system fonts.
 - `templates/README.md.tmpl`: layout. `{{ card "profile" "alt" }}` inserts a theme-aware card.
   `.User` holds all stats (see `internal/stats/profile.go`).

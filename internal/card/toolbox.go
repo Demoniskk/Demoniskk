@@ -52,7 +52,7 @@ func Toolbox(p *stats.Profile, groups []config.ToolGroup, s Style) string {
 			col := cmp.Or(techColors[key], langColors[key], s.Muted)
 			y := firstRow + i*rowH
 			c.f(`<rect x="%d" y="%d" width="8" height="8" rx="2" fill="%s"/>`, x, y-9, col)
-			c.f(`<text x="%d" y="%d" font-size="14">%s</text>`, x+17, y, esc(truncate(item, 22)))
+			c.f(`<text x="%d" y="%d" font-size="14">%s</text>`, x+17, y, esc(truncate(item, s.charsFit(14, float64(colW-41), 22))))
 		}
 		c.f(`</g>`)
 	}

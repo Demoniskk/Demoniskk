@@ -5,6 +5,7 @@
 package card
 
 import (
+	"encoding/base64"
 	"fmt"
 	"html"
 	"strconv"
@@ -28,9 +29,39 @@ var (
 	Light = Theme{Name: "light", Bg: "#ffffff", Surface: "#f6f8fa", Border: "#d1d9e0", Text: "#1f2328", Muted: "#59636e", Track: "#eff2f5"}
 )
 
+// Font is a typeface embedded into every card. Embedding is the only way to use
+// a custom font, because GitHub's image proxy blocks external font requests.
+type Font struct {
+	Family    string
+	Regular   []byte // woff2
+	Bold      []byte // woff2, optional
+	Monospace bool
+}
+
 type Style struct {
 	Theme
 	Accent string
+	Font   *Font // nil uses the viewer's system fonts
+}
+
+func (s Style) mono() bool { return s.Font != nil && s.Font.Monospace }
+
+// textWidth measures text in the card font: exact for a monospace font,
+// a slightly generous estimate otherwise.
+func (s Style) textWidth(text string, size float64) float64 {
+	if s.mono() {
+		return monoWidth(text, size)
+	}
+	return textWidth(text, size)
+}
+
+// charsFit is how many characters fit in maxW at size. sansChars is the tuned
+// count used with proportional system fonts.
+func (s Style) charsFit(size, maxW float64, sansChars int) int {
+	if s.mono() {
+		return int(maxW / (.6 * size))
+	}
+	return sansChars
 }
 
 const (
@@ -78,7 +109,16 @@ func (c *canvas) close() string {
 }
 
 func baseCSS(s Style) string {
-	return fmt.Sprintf(`text{font-family:%s;fill:%s}
+	sans, mono, faces := sansFont, monoFont, ""
+	if f := s.Font; f != nil {
+		faces = fontFace(f.Family, 400, f.Regular)
+		if len(f.Bold) > 0 {
+			faces += fontFace(f.Family, 700, f.Bold)
+		}
+		sans = "'" + f.Family + "'," + sansFont
+		mono = "'" + f.Family + "'," + monoFont
+	}
+	return faces + fmt.Sprintf(`text{font-family:%s;fill:%s}
 .mono{font-family:%s}
 .muted{fill:%s}
 .accent{fill:%s}
@@ -88,7 +128,12 @@ func baseCSS(s Style) string {
 .grow{transform-box:fill-box;transform-origin:left center;animation:grow 1s cubic-bezier(.2,.8,.2,1) both}
 @keyframes grow{from{transform:scaleX(0)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}`,
-		sansFont, s.Text, monoFont, s.Muted, s.Accent)
+		sans, s.Text, mono, s.Muted, s.Accent)
+}
+
+func fontFace(family string, weight int, woff2 []byte) string {
+	return fmt.Sprintf(`@font-face{font-family:'%s';font-weight:%d;src:url(data:font/woff2;base64,%s) format('woff2')}`,
+		family, weight, base64.StdEncoding.EncodeToString(woff2))
 }
 
 // stat draws a big number with a small caps label beneath.
@@ -187,7 +232,8 @@ func textWidth(s string, size float64) float64 {
 	return em * size * .94
 }
 
-// monoWidth is the width of s in a monospace font at size px.
+// monoWidth is the width of s in a monospace font at size px (0.6em per glyph,
+// exact for JetBrains Mono and close for common system monospace fonts).
 func monoWidth(s string, size float64) float64 {
 	return float64(utf8.RuneCountInString(s)) * .6 * size
 }
