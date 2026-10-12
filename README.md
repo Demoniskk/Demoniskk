@@ -25,6 +25,6 @@
 <picture><source media="(prefers-color-scheme: dark)" srcset="assets/activity-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/activity-light.svg"><img alt="Contribution activity" src="assets/activity-dark.svg" width="100%"></picture>
 
 <p align="center"><sub>
-last refreshed Monday 12 October 2026 at 22:18 Oslo time (CEST)<br>
+last refreshed Monday 12 October 2026 at 22:19 Oslo time (CEST)<br>
 stats and cards are rebuilt every 6 hours by a small Go program running on GitHub Actions · <a href="SETUP.md">how it works</a>
 </sub></p>
